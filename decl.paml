@@ -1,0 +1,29 @@
+make_all = fn l -> mapping(builtins.zip(["nom", "gen", "dat", "acc", "abl"], l)) endfn
+
+first_decl = {
+	sing = make_all(["!", "%ae", "%ae", "%am", "%ā"])
+	plur = make_all(["%ae", "%ārum", "%īs", "%ās", "%īs"])
+}
+
+second_decl = {
+	sing = make_all(["!", "%ī", "%ō", "%um", "%ō"])
+	plur = make_all(["%ī", "%ōrum", "%īs", "%ōs", "%īs"])
+}
+
+second_decl_neuter = {
+	sing = second_decl.sing
+	plur = builtins.inherit(second_decl.plur, {
+		nom = "%a"
+		acc = "%a"
+	})
+}
+
+third_decl = {
+	sing = make_all(["!", "%is", "%ī", "%em", "%e"])
+	plur = make_all(["%ēs", "%um", "%ibus", "%ēs", "%ibus"])
+}
+
+# Exported functions
+make_word = fn l -> mapping(builtins.zip(["nom", "gen", "decl"], l)) endfn
+word_replace = 
+decline = fn word, wordset, form, number -> word_replace(wordset.{number}.{form}) endfn
