@@ -39,8 +39,9 @@ def count_syllables(s):
     return n
 
 def is_weak_i_stem(nom, gen):
-    return (nom[-2:] in ['is', ''])
+    return (nom[-2:] in ['is', 'ēs'] and count_syllables(nom) == count_syllables(gen)) or (
+            count_syllables(nom) == 1 and nom[-1] in ['s', 'x'] and gen_to_root(gen)[-2:])   # TODO: Fix!!!
 
 # print(decline(get_inp('nom: '), get_inp('gen: '), get_inp('form: '), get_inp('num: ')))
-
+print(get_inp('asdf: '))
 print(count_syllables(get_inp('asdf: ')))
