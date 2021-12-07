@@ -31,7 +31,7 @@ literal: STRING
 method: expr "." NAME
       | expr "." "{" expr "}"
 
-case: expr "->" expr
+case: expr "->" expr ";"
 
 assignment: NAME "=" expr
 map: "{" start "}"
@@ -74,8 +74,8 @@ ENV = ChainMap({}, {
     }),
     'func': AttrDict({
         'partial': functools.partial,
-        'rotate': lambda f, n: lambda *a: # TODO: FINISH
-    })
+        # 'rotate': lambda f, n: lambda *a: # TODO: FINISH
+    }),
     'platform': platform.uname(),
     'mapping': lambda l: AttrDict(dict(l))
 })
@@ -91,7 +91,7 @@ class FunctionTransformer(Transformer):
 
     def case(self, v):
         value, res = v
-        return lambda env, expected: complete_transform(res, env) if complete_transform(value, env) == expected else NO_RESULT
+        return Tree('compiled_case', [lambda env, expected: complete_transform(res, env) if complete_transform(value, env) == expected else NO_RESULT])
 
     def extern_expr(self, v):
         tree, = v
@@ -138,9 +138,10 @@ class PAMLTransformer(Transformer):
 
     def case_expr(self, v):
         e, *cases = v
+        print(f'{e=}, {type(e)=}')
         expected = complete_transform(e, self.env)
         for x in cases:
-            res = x(self.env, expected)
+            res = x.tree[0](self.env, expected)
             if res != NO_RESULT:
                 return res
 

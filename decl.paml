@@ -25,5 +25,23 @@ third_decl = {
 
 # Exported functions
 make_word = fn l -> mapping(builtins.zip(["nom", "gen", "decl"], l)) endfn
-word_replace = 
-decline = fn word, wordset, form, number -> word_replace(wordset.{number}.{form}) endfn
+num_to_wordset = fn n -> 
+	if builtins.eq(n, "1") then
+		first_decl
+	else 
+		if builtins.eq(n, "2") then
+			second_decl
+		else 
+			if builtins.eq(n, "2n") then
+				second_decl_neuter
+			else 
+				if builtins.eq(n, "3") then
+					third_decl
+				else 
+					third_decl
+				endif
+			endif
+		endif
+	endif
+endfn
+get_form = fn decl, case, number -> num_to_wordset(decl).{number}.{case} endfn
