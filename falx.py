@@ -1,6 +1,7 @@
 import paml
 from dataclasses import dataclass
 import re
+from itertools import chain
 
 DECL = paml.import_module('decl.paml')
 
@@ -8,7 +9,8 @@ MACRON_DICT = {
     'i': 'ī',
     'e': 'ē',
     'a': 'ā',
-    'o': 'ō'     # TODO: Finish!
+    'o': 'ō',
+    'u': 'ū'
 }
 
 def get_inp(p):
@@ -33,23 +35,16 @@ def decline(nom, gen, form: str, num):
 
 def count_syllables(s):
     a = s.replace('ae', '!').replace('oe', '!')
-    n = 0
-    for x in ['a', 'e', 'i', 'o', 'u', '!']:
-        n += a.count(x)
+    return sum(map(a.count, chain(MACRON_DICT.keys(), MACRON_DICT.values(), '!')))
     return n
 
 def is_weak_i_stem(nom, gen):
     if nom in ['canis']: return False   # Move to data file
-    return (
-            nom[-2:] in ['is', 'ēs'] and count_syllables(nom) == count_syllables(gen)
-        ) or (
-            count_syllables(nom) == 1 and nom[-1] in ['s', 'x'] and gen_to_root(gen)[-2] in CONSONANTS and gen_to_root(gen)[-1] in CONSONANTS
-        )
+    return (nom[-2:] in ['is', 'ēs'] and count_syllables(nom) == count_syllables(gen)) or (count_syllables(nom) == 1 and nom[-1] in ['s', 'x'] and gen_to_root(gen)[-2] in CONSONANTS and gen_to_root(gen)[-1] in CONSONANTS)
 
 def is_strong_i_stem(nom, gen, gender):
     return gender == 'neuter' and any(map(nom.endswith, ['e', 'al', 'ar']))
 
 if __name__ == '__main__':
     # print(decline(get_inp('nom: '), get_inp('gen: '), get_inp('form: '), get_inp('num: ')))
-    print(get_inp('asdf: '))
     print(count_syllables(get_inp('asdf: ')))

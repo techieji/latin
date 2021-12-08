@@ -34,7 +34,8 @@ method: expr "." NAME
 case: expr "->" expr ";"
 
 assignment: NAME "=" expr
-          | STRING "=" expr
+          | STRING "=" expr                                 -> py_expr_assignment
+          | "<" expr ">" "=" expr                           -> expr_assignment
 map: "{" start "}"
 
 COMMENT: /#.*/
@@ -205,6 +206,7 @@ def repl(env=ENV):
     expr_parser = Lark(code, start='expr')
     PRINT_EXTERN = False
     while True:
+        exc = None
         s = input('> ')
         if s[0] == ':':
             if s[1] == 'q': break
@@ -217,8 +219,9 @@ def repl(env=ENV):
                     env['_'] = res
                     pprint(res)
                 except UnexpectedCharacters as e:
+                    exc = e
                     run_str(s, env)
-            except Exception as e:
+            except Exception as new_e:
                 print(f'{e}')
 
 if __name__ == '__main__':
