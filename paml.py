@@ -6,7 +6,7 @@ from pprint import pprint
 from argparse import ArgumentParser
 import itertools as it, operator as op, math, json, platform, sys, functools
 
-__version__ = '0.2.4'
+__version__ = '0.4.0'
 n = 6
 
 code = r"""
@@ -34,6 +34,7 @@ method: expr "." NAME
 case: expr "->" expr ";"
 
 assignment: NAME "=" expr
+          | STRING "=" expr
 map: "{" start "}"
 
 COMMENT: /#.*/
@@ -70,14 +71,15 @@ ENV = ChainMap({}, {
         'div': op.truediv,
         'getitem': lambda i, l: l[i],
         'zip': lambda *a: list(zip(*a)),
-        'inherit': lambda a, b: AttrDict({**a, **b})
+        'inherit': lambda a, b: AttrDict({**a, **b}),
+        'get_env': lambda a: AttrDict(ENV)
     }),
     'func': AttrDict({
         'partial': functools.partial,
         # 'rotate': lambda f, n: lambda *a: # TODO: FINISH
     }),
     'platform': platform.uname(),
-    'mapping': lambda l: AttrDict(dict(l))
+    'mapping': lambda l: AttrDict(dict(l)),
 })
 
 class FunctionTransformer(Transformer):

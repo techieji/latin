@@ -32,16 +32,24 @@ def decline(nom, gen, form: str, num):
     return DECL.get_form(find_decl(nom, gen), form, num).replace('!', nom).replace('%', gen_to_root(gen))
 
 def count_syllables(s):
-    a = s.replace('ae', '!').replace('oe', '!')    # replaces dipthongs
+    a = s.replace('ae', '!').replace('oe', '!')
     n = 0
     for x in ['a', 'e', 'i', 'o', 'u', '!']:
         n += a.count(x)
     return n
 
 def is_weak_i_stem(nom, gen):
-    return (nom[-2:] in ['is', 'ēs'] and count_syllables(nom) == count_syllables(gen)) or (
-            count_syllables(nom) == 1 and nom[-1] in ['s', 'x'] and gen_to_root(gen)[-2:])   # TODO: Fix!!!
+    if nom in ['canis']: return False   # Move to data file
+    return (
+            nom[-2:] in ['is', 'ēs'] and count_syllables(nom) == count_syllables(gen)
+        ) or (
+            count_syllables(nom) == 1 and nom[-1] in ['s', 'x'] and gen_to_root(gen)[-2] in CONSONANTS and gen_to_root(gen)[-1] in CONSONANTS
+        )
 
-# print(decline(get_inp('nom: '), get_inp('gen: '), get_inp('form: '), get_inp('num: ')))
-print(get_inp('asdf: '))
-print(count_syllables(get_inp('asdf: ')))
+def is_strong_i_stem(nom, gen, gender):
+    return gender == 'neuter' and any(map(nom.endswith, ['e', 'al', 'ar']))
+
+if __name__ == '__main__':
+    # print(decline(get_inp('nom: '), get_inp('gen: '), get_inp('form: '), get_inp('num: ')))
+    print(get_inp('asdf: '))
+    print(count_syllables(get_inp('asdf: ')))
