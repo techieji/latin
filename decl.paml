@@ -23,12 +23,30 @@ third_decl = {
 	plur = make_all(["%ēs", "%um", "%ibus", "%ēs", "%ibus"])
 }
 
+third_decl_neuter = {
+	sing = builtins.inherit(third_decl.sing, { acc = "!" })
+	plur = builtins.inherit(third_decl.plur, { nom = acc = "%a" })
+}
+
+third_decl_weak_i_stem = {
+	sing = third_decl.sing
+	plur = builtins.inherit(third_decl.plur, { gen = "%ium" })
+}
+
+third_decl_strong_i_stem = {
+	sing = builtins.inherit(third_decl_neuter, { abl = "%ī" })
+	plur = builtins.inherit(third_decl_weak_i_stem, { nom = acc = "%ia" })
+}
+
 # Exported functions
 make_word = fn l -> mapping(builtins.zip(["nom", "gen", "decl"], l)) endfn
-num_to_wordset = fn n -> {
+num_to_wordset_set = {
 	"1" = first_decl
 	"2" = second_decl
 	"2n" = second_decl_neuter
 	"3" = third_decl
-}.{n} endfn
-get_form = fn decl, case, number -> num_to_wordset(decl).{number}.{case} endfn
+	"3n" = third_decl_neuter
+	"3i" = third_decl_weak_i_stem
+	"3I" = third_decl_strong_i_stem
+}
+get_form = fn decl, case, number -> num_to_wordset_set.{decl}.{number}.{case} endfn

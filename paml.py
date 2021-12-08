@@ -33,9 +33,10 @@ method: expr "." NAME
 
 case: expr "->" expr ";"
 
-assignment: NAME "=" expr
-          | STRING "=" expr                                 -> py_expr_assignment
-          | "<" expr ">" "=" expr                           -> expr_assignment
+assignment: (set_decl "=")+ expr
+set_decl: NAME
+        | STRING
+        | "<" expr ">"
 map: "{" start "}"
 
 COMMENT: /#.*/
@@ -62,6 +63,7 @@ PRINT_EXTERN = True
 ENV = ChainMap({}, {
     'true': True,
     'false': False,
+    'import': lambda f: import_module(f),
     'builtins': AttrDict({
         'trace': lambda x, y="": [print(x), y][1],
         'format': lambda s, *a: s.format(*a),
@@ -128,7 +130,14 @@ class PAMLTransformer(Transformer):
         return v[0](self.env)
 
     def assignment(self, v):
-        self.env[v[0]] = v[1]
+        *x, a = v
+        for i in x:
+            self.env[i] = a
+
+    def set_decl(self, v):
+        if v[0].startswith('"'):
+            return eval(v[0])
+        return v[0]
 
     def literal(self, v):
         return eval(v[0])
@@ -200,13 +209,14 @@ def run_file(f):
     print('\n======= DATA =======')
     pprint(d)
 
+EXC = None
 def repl(env=ENV):
     global PRINT_EXTERN
+    global EXC
     print(f'Welcome to PAML {__version__}!\nType :h for help or :q to exit.')
     expr_parser = Lark(code, start='expr')
     PRINT_EXTERN = False
     while True:
-        exc = None
         s = input('> ')
         if s[0] == ':':
             if s[1] == 'q': break
@@ -219,10 +229,12 @@ def repl(env=ENV):
                     env['_'] = res
                     pprint(res)
                 except UnexpectedCharacters as e:
-                    exc = e
+                    EXC = e
                     run_str(s, env)
+                except Exception as e:
+                    print(f'{e}')
             except Exception as new_e:
-                print(f'{e}')
+                print(f'{EXC}')
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
