@@ -2,8 +2,10 @@ import paml
 from dataclasses import dataclass
 import re
 from itertools import chain
+from functools import reduce
 
 DECL = paml.import_module('decl.paml')
+CONJ = paml.import_module('conj.paml')
 
 MACRON_DICT = {
     'i': 'ī',
@@ -12,6 +14,8 @@ MACRON_DICT = {
     'o': 'ō',
     'u': 'ū'
 }
+
+DIPHTHONGS = ['ae', 'au', 'ei', 'eu', 'oe', 'ui']
 
 def get_inp(p):
     return re.sub(r'.-', lambda s: MACRON_DICT[s.group(0)[0]], input(p))
@@ -41,9 +45,8 @@ def decline(nom, gen, gender, form: str, num):
     return DECL.get_form(find_decl(nom, gen, gender), form, num).replace('!', nom).replace('%', gen_to_root(gen))
 
 def count_syllables(s):
-    a = s.replace('ae', '!').replace('oe', '!')
+    a = reduce(lambda s, a: s.replace(a, '!'), DIPHTHONGS)
     return sum(map(a.count, chain(MACRON_DICT.keys(), MACRON_DICT.values(), '!')))
-    return n
 
 def is_weak_i_stem(nom, gen):
     if nom in ['canis']: return False   # Move to data file
@@ -55,5 +58,3 @@ def is_strong_i_stem(nom, gen, gender):
 if __name__ == '__main__':
     print(decline(get_inp('nom: '), get_inp('gen: '), get_inp('gdr: '), get_inp('frm: '), get_inp('num: ')))
     # print(decline('mare', 'maris', 'n', 'acc', 'plur'))
-
-
