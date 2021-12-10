@@ -44,6 +44,23 @@ def find_decl(nom, gen, gender):
 def decline(nom, gen, gender, form: str, num):
     return DECL.get_form(find_decl(nom, gen, gender), form, num).replace('!', nom).replace('%', gen_to_root(gen))
 
+def find_conj(p2):
+    c = p2[-3]
+    if c == 'ā':
+        return '1'
+    elif c == 'ē':
+        return '2'
+    elif c == 'e':
+        return '3' if p2[-2:] != 'io' else '3io'
+    elif c == 'i':
+        return '4'
+
+def inf_to_root(p2):
+    return p2[:-3]
+
+def conjugate(p1, p2, p3, p4, tense, person, number):
+    return CONJ.get_form(tense, find_conj(p2), number, person).replace('1', p1).replace('%', inf_to_root(p2))
+
 def count_syllables(s):
     a = reduce(lambda s, a: s.replace(a, '!'), DIPHTHONGS)
     return sum(map(a.count, chain(MACRON_DICT.keys(), MACRON_DICT.values(), '!')))
@@ -56,5 +73,6 @@ def is_strong_i_stem(nom, gen, gender):
     return gender == 'n' and any(map(nom.endswith, ['e', 'al', 'ar']))
 
 if __name__ == '__main__':
-    print(decline(get_inp('nom: '), get_inp('gen: '), get_inp('gdr: '), get_inp('frm: '), get_inp('num: ')))
+    # print(decline(get_inp('nom: '), get_inp('gen: '), get_inp('gdr: '), get_inp('frm: '), get_inp('num: ')))
     # print(decline('mare', 'maris', 'n', 'acc', 'plur'))
+    print(conjugate('teneo', 'tenēre', '', '', 'present', '1', 'plur'))

@@ -39,7 +39,6 @@ third_decl_strong_i_stem = {
 }
 
 # Exported functions
-make_word = fn l -> mapping(builtins.zip(["nom", "gen", "decl"], l)) endfn
 num_to_wordset_set = {
 	"1" = first_decl
 	"2" = second_decl

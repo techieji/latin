@@ -6,6 +6,11 @@ from pprint import pprint
 from argparse import ArgumentParser
 import itertools as it, operator as op, math, json, platform, sys, functools
 
+try:
+    from prompt_toolkit import prompt
+except ImportError:
+    prompt = input
+
 __version__ = '0.4.0'
 n = 6
 
@@ -52,7 +57,7 @@ parser = Lark(code, propagate_positions=True)
 
 class AttrDict(dict):
     __init__ = lambda self, d: super().__init__({str(x): y for x, y in d.items()})
-    __getattr__ = lambda self, k: self[k]
+    __getattr__ = lambda self, k: self[str(k)]
 
 def _select_from_dict(d, keys):
     return {x: d[x] for x in keys}
@@ -80,6 +85,11 @@ ENV = ChainMap({}, {
     'func': AttrDict({
         'partial': functools.partial,
         # 'rotate': lambda f, n: lambda *a: # TODO: FINISH
+    }),
+    'file': AttrDict({
+        'open': open,
+        'close': lambda f: f.close(),
+        'read': lambda f: open(f).read() if type(f) is str else f.read()
     }),
     'platform': platform.uname(),
     'mapping': lambda l: AttrDict(dict(l)),
@@ -217,7 +227,7 @@ def repl(env=ENV):
     expr_parser = Lark(code, start='expr')
     PRINT_EXTERN = False
     while True:
-        s = input('> ')
+        s = prompt('> ')
         if s[0] == ':':
             if s[1] == 'q': break
             elif s[1] == 'h': print('Commands: :q (exit), :h (help), :e (print environment)')
@@ -227,7 +237,10 @@ def repl(env=ENV):
                 try:
                     res = complete_transform(expr_parser.parse(s), env)
                     env['_'] = res
-                    pprint(res)
+                    if type(res) is AttrDict:
+                        pprint(res)
+                    else:
+                        print(repr(res))
                 except UnexpectedCharacters as e:
                     EXC = e
                     run_str(s, env)

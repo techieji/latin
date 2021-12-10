@@ -1,12 +1,14 @@
 mk_conj = fn s, p -> {
-	sing = s
-	plur = p
+	sing = mapping(builtins.zip([1, 2, 3], s))
+	plur = mapping(builtins.zip([1, 2, 3], p))
 } endfn
 
 present = {
-	"1st" = mk_conj(["1", "%ās", "%at"], ["%āmus", "%ātis", "%ant"])
-	"2nd" = mk_conj(["1", "%ēs", "%et"], ["%ēmus", "%ētis", "%ent"])
-	"3rd" = mk_conj(["1", "%is", "%it"], ["%imus", "%itis", "%unt"])     # TODO: FIX!
-	"3rdio" = mk_conj(["1", "%is", "%it"], ["%imus", "%itis", "%iunt"])     # TODO: FIX!
-	"4th" = mk_conj(["1", "%īs", "%it"], ["%īmus", "%ītis", "%iunt"])
+	"1" = mk_conj(["1", "%ās", "%at"], ["%āmus", "%ātis", "%ant"])
+	"2" = mk_conj(["1", "%ēs", "%et"], ["%ēmus", "%ētis", "%ent"])
+	"3" = mk_conj(["1", "%is", "%it"], ["%imus", "%itis", "%unt"])     # TODO: FIX!
+	"3io" = mk_conj(["1", "%is", "%it"], ["%imus", "%itis", "%iunt"])     # TODO: FIX!
+	"4" = mk_conj(["1", "%īs", "%it"], ["%īmus", "%ītis", "%iunt"])
 }
+
+get_form = fn tense, conj, number, person -> builtins.get_env().{tense}.{conj}.{number}.{person} endfn
