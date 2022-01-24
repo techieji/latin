@@ -17,8 +17,9 @@ MACRON_DICT = {
 
 DIPHTHONGS = ['ae', 'au', 'ei', 'eu', 'oe', 'ui']
 
-def get_inp(p):
-    return re.sub(r'.-', lambda s: MACRON_DICT[s.group(0)[0]], input(p))
+def get_inp(p, default=''):
+    res = re.sub(r'.-', lambda s: MACRON_DICT[s.group(0)[0]], input(p))
+    return res if res else default
 
 def gen_to_root(gen):
     if gen.endswith('ae') or gen.endswith('is'):
@@ -58,8 +59,18 @@ def find_conj(p2):
 def inf_to_root(p2):
     return p2[:-3]
 
-def conjugate(p1, p2, p3, p4, tense, person, number):
-    return CONJ.get_form(tense, find_conj(p2), number, person).replace('1', p1).replace('%', inf_to_root(p2))
+def ex_to_root_and_conj(s):
+    if s[-1] == 't':
+        root = s[:-2]
+        if s[-2] == 'a':
+            conj = '1'
+
+def conjugate(p1, p2, p3, p4, tense, person, number = 'misc', root = None, conj = None):
+    if not root:
+        root = inf_to_root(p2)
+    if not conj:
+        conj = find_conj(p2)
+    return CONJ.get_form(tense, conj, number, person).replace('1', p1).replace('%', root)
 
 def count_syllables(s):
     a = reduce(lambda s, a: s.replace(a, '!'), DIPHTHONGS)
@@ -74,5 +85,5 @@ def is_strong_i_stem(nom, gen, gender):
 
 if __name__ == '__main__':
     # print(decline(get_inp('nom: '), get_inp('gen: '), get_inp('gdr: '), get_inp('frm: '), get_inp('num: ')))
-    # print(decline('mare', 'maris', 'n', 'acc', 'plur'))
-    print(conjugate('teneo', 'tenēre', '', '', 'present', '1', 'plur'))
+    # print(decline('mare', 'maris', 'n', 'abl', 'sing'))
+    print(conjugate(*[get_inp(f'Principal part {x}: ') for x in range(1, 5)], get_inp('tense: '), get_inp('person: '), get_inp('number (misc): ', default='misc')))

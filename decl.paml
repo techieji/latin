@@ -34,8 +34,8 @@ third_decl_weak_i_stem = {
 }
 
 third_decl_strong_i_stem = {
-	sing = builtins.inherit(third_decl_neuter, { abl = "%ī" })
-	plur = builtins.inherit(third_decl_weak_i_stem, { nom = acc = "%ia" })
+	sing = builtins.inherit(third_decl_neuter.sing, { abl = "%ī" })
+	plur = builtins.inherit(third_decl_weak_i_stem.plur, { nom = acc = "%ia" })
 }
 
 # Exported functions
